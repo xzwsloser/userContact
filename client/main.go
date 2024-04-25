@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"userContact/client/User"
+)
 
 func main() {
 	// 接受用户的选择和菜单的显示
@@ -39,8 +42,13 @@ func main() {
 		fmt.Println("请输入用户的 ID 号")
 		fmt.Scanf("%d\n", &userId)
 		fmt.Println("请输入用户的密码")
-		fmt.Scanf("%d\n", &userPwd)
+		fmt.Scanf("%s\n", &userPwd)
 		// 登录的业务 , 写到另外一个文件中
-
+		err := User.Login(userId, userPwd)
+		if err != nil {
+			fmt.Println("登录成功")
+		} else {
+			fmt.Println("登录失败")
+		}
 	}
 }
