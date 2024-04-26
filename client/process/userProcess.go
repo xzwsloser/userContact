@@ -1,4 +1,4 @@
-package User
+package userprocess
 
 import (
 	"encoding/binary"
@@ -9,8 +9,12 @@ import (
 	"userContact/server/utils"
 )
 
+type UserProcess struct {
+	// 暂时不用字段
+}
+
 // 完成登录的函数
-func Login(userId int, userPwd string) (err error) {
+func (up *UserProcess) Login(userId int, userPwd string) (err error) {
 	// 判断登录是否成功,最好返回一个 error
 	// 开始定一个协议
 
@@ -67,6 +71,7 @@ func Login(userId int, userPwd string) (err error) {
 	if err != nil {
 		fmt.Println("发送消息失败, err =", err)
 	}
+	// 其实这里可以创建一个 全局变量 Tf 进行操作
 	var tf utils.Transfer = utils.Transfer{
 		Conn: conn,
 	}
@@ -84,7 +89,15 @@ func Login(userId int, userPwd string) (err error) {
 		return
 	}
 	if loginResMes.Code == 200 {
-		fmt.Println("登陆成功")
+		//fmt.Println("登陆成功")
+		// 显示登录成功之后的一个菜单,但是需要利用循环显示
+		for {
+			ShowMenu() // 显示菜单
+			// 这里还要开启一个协程
+			// 这一个协程时刻监听服务器的响应,如果服务器有数据推送到客户端,并且显示在客户端
+			// 这一个协程的作用就是不断读取信息
+			go ServerProcess(conn)
+		}
 	} else if loginResMes.Code == 500 {
 		fmt.Println(loginResMes.Error)
 	}
