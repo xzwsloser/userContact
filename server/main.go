@@ -1,41 +1,70 @@
 package main
 
 import (
-	"encoding/binary"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net"
 	"userContact/common"
+	"userContact/utils"
 )
 
-func readPkg(conn net.Conn) (mes common.Message, err error) {
-	for {
-		buf := make([]byte, 1024*4)
-		n, err := conn.Read(buf[:4]) // 注意读取的长度
-		if n != 4 || err != nil {
-			err = errors.New("read pkg header error")
-			return common.Message{}, err
-		}
-		// 开始服务端接收信息,判断用户消息的合法性并且判断信息的合理性
-		// 根据读取到的长度尽心一个转换
-		var pkgLen uint32
-		pkgLen = binary.BigEndian.Uint32(buf[:4]) // 就是把切片解析成一个数字,就是一个反向的转换
-		// 根据一个 pkgLen 读取消息内容
-		n, err = conn.Read(buf[:pkgLen])
-		if n != int(pkgLen) || err != nil {
-			err = errors.New("read pkg body error")
-			return common.Message{}, err
-		}
-		// 此时值已经被写入到 buf 中
-		// 开始把 pkgLen  反序列化
-		// 可以使用返回值中的一个参数
-		err = json.Unmarshal(buf[:pkgLen], &mes) // 注意之后的一个 &msg , 地址传递才可以改变值
-		if err != nil {
-			fmt.Println("反序列化失败 , err =", err)
-		}
-		return mes, err
+// 根据客户端发送的请求的种类不同,调用不同函数, 相当于 Controller 层
+func ServiceProcessMes(conn net.Conn, mes *common.Message) (err error) {
+	switch mes.Type {
+	case common.LoginMesType:
+		// 登录业务逻辑
+		ServiceProcessLogin(conn, mes)
+	case common.RegisterMesType:
+		// 处理登录的逻辑
+	default:
+
+		fmt.Println("消息类型不存在")
 	}
+	return
+}
+
+// 处理登录请求
+func ServiceProcessLogin(conn net.Conn, mes *common.Message) (err error) {
+	// 取出一个Data , 进行相应的判断,发送相应的信息
+	var loginMes common.LoginMes
+	err = json.Unmarshal([]byte(mes.Data), &loginMes)
+	if err != nil {
+		fmt.Println("json.Unmarshal fall err = ", err)
+		return err
+	}
+	// 定义一个返回类型, 注意 Message 统一用于封装
+	var resMes common.Message
+	resMes.Type = common.LoginResMesType
+	// 定义一个返回结构
+	var loginResMeg common.LoginResMes
+
+	// 数据库中查找用户的逻辑
+	if loginMes.UserId == 100 && loginMes.UserPwd == "loser" {
+		// 合法
+		loginResMeg.Code = 200
+
+	} else {
+		// 不合法
+		loginResMeg.Code = 500 // 用户不存在
+		loginResMeg.Error = "用户不存在,请注册之后再使用..."
+	}
+	// 完成序列化
+	// 1. 首先序列化 loginResMsg
+	data, err := json.Marshal(loginResMeg)
+	if err != nil {
+		fmt.Println("响应结构体序列化失败")
+		return
+	}
+	// 2. 开始序列化另外一个
+	resMes.Data = string(data)
+	mesData, err := json.Marshal(resMes)
+	if err != nil {
+		fmt.Println("响应信息序列化失败")
+	}
+	// 得到的就是响应信息
+	err = utils.WritePkg(conn, mesData)
+	// 最后发送信息, 首先还是确定长度
+	return
 }
 
 // 处理和客户端的通信
@@ -44,11 +73,12 @@ func Process(conn net.Conn) {
 	// 演示关闭 conn
 	defer conn.Close()
 	// 循环读取客户发送的消息
-	mes, err := readPkg(conn)
+	mes, err := utils.ReadPkg(conn)
 	if err != nil {
 		fmt.Println("获取对象失败, err =", err)
 	}
 	fmt.Println("mes =", mes)
+	ServiceProcessMes(conn, &mes)
 }
 
 // 将读取数据包封装成一个函数

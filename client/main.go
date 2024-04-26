@@ -45,10 +45,11 @@ func main() {
 		fmt.Scanf("%s\n", &userPwd)
 		// 登录的业务 , 写到另外一个文件中
 		err := User.Login(userId, userPwd)
+		fmt.Println(err)
 		if err != nil {
-			fmt.Println("登录成功")
+			// 失败
 		} else {
-			fmt.Println("登录失败")
+			// 成功
 		}
 	}
 }

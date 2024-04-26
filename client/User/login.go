@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net"
 	"userContact/common"
+	"userContact/utils"
 )
 
 // 完成登录的函数
@@ -66,5 +67,24 @@ func Login(userId int, userPwd string) (err error) {
 	if err != nil {
 		fmt.Println("发送消息失败, err =", err)
 	}
+	mes, err = utils.ReadPkg(conn)
+	fmt.Println(mes, err)
+	// 开始反序列化成一个 LoginResMes
+	if err != nil {
+		fmt.Println("读取服务器信息出错")
+		return
+	}
+	var loginResMes common.LoginResMes
+	err = json.Unmarshal([]byte(mes.Data), &loginResMes)
+	if err != nil {
+		fmt.Println("反序列化失败")
+		return
+	}
+	if loginResMes.Code == 200 {
+		fmt.Println("登陆成功")
+	} else if loginResMes.Code == 500 {
+		fmt.Println(loginResMes.Error)
+	}
+	// 最后转换为一个对象
 	return
 }

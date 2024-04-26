@@ -4,6 +4,8 @@ package common
 const (
 	LoginMesType    = "LoginMes"
 	LoginResMesType = "LoginResMes"
+	RegisterMesType = "RegisterMes"
+	RegisterResType = "RegisterRes"
 )
 
 // 定义客户端发送的结构体
@@ -21,4 +23,7 @@ type LoginMes struct {
 type LoginResMes struct {
 	Code  int    `json:"code"`  // 返回状态码
 	Error string `json:"error"` // 返回错误信息
+}
+
+type RegisterMes struct {
 }
