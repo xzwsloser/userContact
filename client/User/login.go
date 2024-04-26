@@ -67,7 +67,10 @@ func Login(userId int, userPwd string) (err error) {
 	if err != nil {
 		fmt.Println("发送消息失败, err =", err)
 	}
-	mes, err = utils.ReadPkg(conn)
+	var tf utils.Transfer = utils.Transfer{
+		Conn: conn,
+	}
+	mes, err = tf.ReadPkg()
 	fmt.Println(mes, err)
 	// 开始反序列化成一个 LoginResMes
 	if err != nil {
