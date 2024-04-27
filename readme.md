@@ -97,4 +97,12 @@
 3. 同时在 main 包中添加 redis.go 函数用于初始化 redis.Client 对象 , 同时在 main 函数中写完了初始化函数(包含初始化client和初始化 userDao 函数)
 4. 创建了全局变量MyUserDao 和 Client 对象,同时利用初始化对象进行操作
 5. 改良了 UserProcess 中的登录业务处理逻辑
-
+### 9. 利用 redis 进行用户的注册
+分析步骤:
+1. 首先先添加两个消息类型(common 包中添加),其中注册使用的字段可以使用一个User 替代
+2. 在 main.go 中拿到用户信息,在 UserProcess.go 中增加一个 Register 方法,完成请求注册
+3. 注意此时 Login处理的业务逻辑基本和 Register 的方法逻辑相同,大致分为以下几步 :
+   1. 首先创建一个 Message 对象
+   2. 创建一个 用户对象(登录或者注册用户),把用户对象序列化赋值给 mes 的 Data 字段
+   3. 把 mes 序列化 , 之后调用 Transfer 中的 WritePkg 方法发送 mes 序列化之后的长度
+   4. 最后 利用 ReadPkg 方法读取到一个响应的结果,利用状态码判断之后的业务逻辑

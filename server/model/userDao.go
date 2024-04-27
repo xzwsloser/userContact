@@ -63,3 +63,21 @@ func (this *UserDao) Login(userid int, userpwd string) (user *User, err error) {
 	// 传递一个对象
 	return user, nil
 }
+
+// 添加用户的业务逻辑
+
+func (this *UserDao) AddUser(userid int, userpwd string, username string) error {
+	// 还是相当于 dao 层的方法,其中还是利用数据库处理函数进行操作
+	// 首先调用方法寻找相关的用户
+	_, err := this.GetUserById(userid)
+	if err != nil {
+		err = ERROR_USER_EXISTS
+		return err
+	}
+	// 如果没有对应的用户就开始添加
+	ctx := context.Background()
+	// 这里使用模式化字符串的方法
+	userStr := fmt.Sprintf("{\"userid\":%d,\"userpwd\":\"%s\",\"username\":\"%s\"}", userid, userpwd, username)
+	this.Client.HSet(ctx, "users", strconv.Itoa(userid), userStr)
+	return nil
+}

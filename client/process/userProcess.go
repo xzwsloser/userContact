@@ -5,12 +5,76 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
+	"os"
 	"userContact/common"
 	"userContact/server/utils"
 )
 
 type UserProcess struct {
 	// 暂时不用字段
+}
+
+func (up *UserProcess) Register(userid int, userpwd string, username string) (err error) {
+	// 1. 连接到服务器
+	conn, err := net.Dial("tcp", "localhost:8889")
+	if err != nil {
+		fmt.Println("net.Dial error = ", err)
+		return err
+	}
+	var mes common.Message
+	mes.Type = common.RegisterMesType
+	// 实例化对象信息,用于装入到结构体中
+	var regiterMes common.RegisterMes
+	regiterMes.User.UserName = username
+	regiterMes.User.UserId = userid
+	regiterMes.User.UserPwd = userpwd
+	// 开始进行信息的序列化
+	registerData, err := json.Marshal(regiterMes)
+	if err != nil {
+		fmt.Println("注册序列化失败")
+		return err
+	}
+	mes.Data = string(registerData)
+	// 开始把 mes 序列化
+	data, err := json.Marshal(mes)
+	if err != nil {
+		fmt.Println("发送信息序列化失败")
+		return err
+	}
+	// 开始发送长度,其实就是 WritePkg 方法
+	// 开始创建一个
+	tf := &utils.Transfer{
+		Conn: conn,
+	}
+	err = tf.WritePkg(data)
+	if err != nil {
+		fmt.Println("writePkg wrong,err = ", err)
+		return err
+
+	}
+	// 开始读一个包
+	mes, err = tf.ReadPkg()
+	// 返回的就是一个信息
+	var registerResMes common.RegisterResMes
+	err = json.Unmarshal([]byte(mes.Data), &registerResMes)
+	if err != nil {
+		fmt.Println("反序列化失败")
+		return
+	}
+	// 问什么会打印失败呢
+	if registerResMes.Code == 200 {
+		//fmt.Println("登陆成功")
+		fmt.Println("注册成功,请重新登录")
+		os.Exit(0)
+	} else if registerResMes.Code == 500 {
+		fmt.Println(registerResMes.Error)
+		os.Exit(0)
+
+	}
+	// 最后转换为一个对象
+	os.Exit(0)
+	return
+
 }
 
 // 完成登录的函数

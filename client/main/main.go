@@ -38,6 +38,21 @@ func main() {
 			//loop = false
 		case 2:
 			fmt.Println("注册用户")
+			var userId int
+			var userPwd string
+			var userName string
+			fmt.Println("请输入用户的 ID 号")
+			fmt.Scanf("%d\n", userId)
+			fmt.Println("请输入用户的密码")
+			fmt.Scanf("%s\n", userPwd)
+			fmt.Println("请输入用户的昵称")
+			fmt.Scanf("%s\n", userName)
+			// 调用一个 UserProcess 示例中的方法
+			up := &userprocess.UserProcess{}
+			err := up.Register(userId, userPwd, userName)
+			if err != nil {
+				fmt.Println("注册失败请重试")
+			}
 			//loop = false
 		case 3:
 			fmt.Println("退出系统")

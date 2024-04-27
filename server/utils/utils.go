@@ -66,6 +66,5 @@ func (this *Transfer) WritePkg(mesData []byte) (err error) {
 		fmt.Println("发送数据长度不正确")
 		return
 	}
-
 	return
 }

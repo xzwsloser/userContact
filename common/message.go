@@ -2,10 +2,10 @@ package common
 
 // 定义消息类型, 比如上限的消息
 const (
-	LoginMesType    = "LoginMes"
-	LoginResMesType = "LoginResMes"
-	RegisterMesType = "RegisterMes"
-	RegisterResType = "RegisterRes"
+	LoginMesType       = "LoginMes"
+	LoginResMesType    = "LoginResMes"
+	RegisterMesType    = "RegisterMes"
+	RegisterResMesType = "RegisterResMes"
 )
 
 // 这里注意结构体之间的包含关系,首先第一个结构体 Message 结构体中的第二个字段其实就是相应的对象序列化之后的结构
@@ -27,5 +27,13 @@ type LoginResMes struct {
 	Error string `json:"error"` // 返回错误信息
 }
 
+// 相当于一个继承关系
 type RegisterMes struct {
+	User User `json:"user"` // 注册信息类型
+}
+
+// 注册相应的状态码
+type RegisterResMes struct {
+	Code  int    `json:"code"`
+	Error string `json:"error"`
 }
