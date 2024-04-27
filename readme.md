@@ -84,3 +84,15 @@
 4. 需要利用服务器端维护一个连接池,每一次取出一个连接池(其实就是一个 redis.Client 对象)
 架构图:
 ![img.png](img/img4.png)
+
+### 8. 利用 redis 数据库管理用户信息
+#### 添加用户信息
+1. 利用 hash 的数据结构,利用 hset 添加元素,利用 hget 查询元素
+2. 但是注意hash 的值是要给json 字符串,这一个字符串中的引号需要使用转义字符引起来
+3. 但是这里使用的不是一个连接池,而是封装的一个 redis.Client 对象
+#### 校验用户信息
+1. 首先创建了一个 userDao 对象,创建其中的一个方法GetUserDao函数(相当于 mvc 中的 dao 包),
+同时创建一个方法 Login 方法根据用户名和 密码利用 GetUserDao 函数取得对象并且进行密码比较
+2. 另外自定义了错误信息 Error.go
+3. 同时在 main 包中添加 redis.go 函数用于初始化 redis.Client 对象 , 同时在 main 函数中写完了初始化函数(包含初始化client和初始化 userDao 函数)
+4. 创建了全局变量MyUserDao 和 Client 对象,同时利用初始化对象进行操作

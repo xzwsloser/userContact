@@ -42,6 +42,8 @@ func ServerProcess(conn net.Conn) {
 	}
 	for {
 		// 保持通信, 注意这里会发生一个阻塞
+		// 此时就会阻塞在这里
+		// 注意里面的Read 函数们没有读取到数据不会报错,而是等待一个特定的时间之后就会报错
 		mes, err := tf.ReadPkg()
 		if err != nil {
 			fmt.Println("协程读取服务器端信息失败")

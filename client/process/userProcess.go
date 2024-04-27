@@ -88,6 +88,7 @@ func (up *UserProcess) Login(userId int, userPwd string) (err error) {
 		fmt.Println("反序列化失败")
 		return
 	}
+	// 问什么会打印失败呢
 	if loginResMes.Code == 200 {
 		//fmt.Println("登陆成功")
 		// 显示登录成功之后的一个菜单,但是需要利用循环显示

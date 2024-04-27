@@ -18,7 +18,6 @@ func (this *Processor) ServiceProcessMes(mes *common.Message) (err error) {
 	switch mes.Type {
 	case common.LoginMesType:
 		// 登录业务逻辑
-
 		var userProcess process.UserProcess = process.UserProcess{
 			Conn: this.Conn,
 		}
