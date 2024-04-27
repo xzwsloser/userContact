@@ -42,11 +42,11 @@ func main() {
 			var userPwd string
 			var userName string
 			fmt.Println("请输入用户的 ID 号")
-			fmt.Scanf("%d\n", userId)
+			fmt.Scanf("%d\n", &userId)
 			fmt.Println("请输入用户的密码")
-			fmt.Scanf("%s\n", userPwd)
+			fmt.Scanf("%s\n", &userPwd)
 			fmt.Println("请输入用户的昵称")
-			fmt.Scanf("%s\n", userName)
+			fmt.Scanf("%s\n", &userName)
 			// 调用一个 UserProcess 示例中的方法
 			up := &userprocess.UserProcess{}
 			err := up.Register(userId, userPwd, userName)

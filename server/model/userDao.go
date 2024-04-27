@@ -66,18 +66,29 @@ func (this *UserDao) Login(userid int, userpwd string) (user *User, err error) {
 
 // 添加用户的业务逻辑
 
-func (this *UserDao) AddUser(userid int, userpwd string, username string) error {
+func (this *UserDao) Register(user *User) error {
 	// 还是相当于 dao 层的方法,其中还是利用数据库处理函数进行操作
 	// 首先调用方法寻找相关的用户
-	_, err := this.GetUserById(userid)
+	_, err := this.GetUserById(user.UserId)
 	if err != nil {
 		err = ERROR_USER_EXISTS
 		return err
 	}
+	// 此时说明没有注册过函数
 	// 如果没有对应的用户就开始添加
 	ctx := context.Background()
 	// 这里使用模式化字符串的方法
-	userStr := fmt.Sprintf("{\"userid\":%d,\"userpwd\":\"%s\",\"username\":\"%s\"}", userid, userpwd, username)
-	this.Client.HSet(ctx, "users", strconv.Itoa(userid), userStr)
+	// 注意序列化信息进行操作
+	data, err := json.Marshal(*user)
+	if err != nil {
+		fmt.Println("序列化失败")
+		return err
+	}
+	// 开始入库
+	_, err = this.Client.HSet(ctx, "users", strconv.Itoa(user.UserId), string(data)).Result()
+	if err != nil {
+		fmt.Println("保存注册用户失败 err = ", err)
+		return err
+	}
 	return nil
 }

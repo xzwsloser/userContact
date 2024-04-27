@@ -1,5 +1,7 @@
 package common
 
+import "userContact/server/model"
+
 // 定义消息类型, 比如上限的消息
 const (
 	LoginMesType       = "LoginMes"
@@ -29,7 +31,7 @@ type LoginResMes struct {
 
 // 相当于一个继承关系
 type RegisterMes struct {
-	User User `json:"user"` // 注册信息类型
+	User model.User `json:"user"` // 注册信息类型
 }
 
 // 注册相应的状态码

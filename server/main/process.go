@@ -21,9 +21,22 @@ func (this *Processor) ServiceProcessMes(mes *common.Message) (err error) {
 		var userProcess process.UserProcess = process.UserProcess{
 			Conn: this.Conn,
 		}
-		userProcess.ServiceProcessLogin(mes)
+		err := userProcess.ServiceProcessLogin(mes)
+		if err != nil {
+			fmt.Println("总控处理注册逻辑错误")
+		}
 	case common.RegisterMesType:
 		// 处理登录的逻辑
+		var userProcess process.UserProcess = process.UserProcess{
+			Conn: this.Conn,
+		}
+		err := userProcess.ServiceProcessRegister(mes)
+		if err != nil {
+			fmt.Println("总控处理注册逻辑错误")
+		}
+		// 创建一个方法处理注册请求
+		// 类似上面的一个方法
+
 	default:
 
 		fmt.Println("消息类型不存在")
