@@ -96,3 +96,5 @@
 2. 另外自定义了错误信息 Error.go
 3. 同时在 main 包中添加 redis.go 函数用于初始化 redis.Client 对象 , 同时在 main 函数中写完了初始化函数(包含初始化client和初始化 userDao 函数)
 4. 创建了全局变量MyUserDao 和 Client 对象,同时利用初始化对象进行操作
+5. 改良了 UserProcess 中的登录业务处理逻辑
+
