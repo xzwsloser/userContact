@@ -53,10 +53,10 @@ func (up *UserProcess) Register(userid int, userpwd string, username string) (er
 
 	}
 	// 开始读一个包
-	mes, err = tf.ReadPkg()
+	Newmes, err := tf.ReadPkg()
 	// 返回的就是一个信息
 	var registerResMes common.RegisterResMes
-	err = json.Unmarshal([]byte(mes.Data), &registerResMes)
+	err = json.Unmarshal([]byte(Newmes.Data), &registerResMes)
 	if err != nil {
 		fmt.Println("反序列化失败")
 		return

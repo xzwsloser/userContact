@@ -31,9 +31,12 @@ func (this *UserDao) GetUserById(id int) (user *User, err error) {
 	ctx := context.Background()
 	// 利用 rdb 进行操作
 	res, err := this.Client.HGet(ctx, "users", strconv.Itoa(id)).Result()
+	// 没有找到用户所以就会报错
+
 	if err != nil {
-		// 没有找到用户, 其实就就是错误
-		err = ERROR_USER_NOTEXISTS
+		if err == redis.Nil {
+			err = ERROR_USER_NOTEXISTS
+		}
 		return user, err
 	}
 	// 利用指针的方法的话,其实返回的无论如何都是同一个值
@@ -46,6 +49,7 @@ func (this *UserDao) GetUserById(id int) (user *User, err error) {
 		fmt.Println("反序列化出错")
 		return user, err
 	}
+	// 相当于已经找到了用户
 	return
 }
 
@@ -69,8 +73,10 @@ func (this *UserDao) Login(userid int, userpwd string) (user *User, err error) {
 func (this *UserDao) Register(user *User) error {
 	// 还是相当于 dao 层的方法,其中还是利用数据库处理函数进行操作
 	// 首先调用方法寻找相关的用户
+
 	_, err := this.GetUserById(user.UserId)
-	if err != nil {
+	// 其实就是用户存在
+	if err == nil {
 		err = ERROR_USER_EXISTS
 		return err
 	}
@@ -79,16 +85,20 @@ func (this *UserDao) Register(user *User) error {
 	ctx := context.Background()
 	// 这里使用模式化字符串的方法
 	// 注意序列化信息进行操作
-	data, err := json.Marshal(*user)
+	fmt.Println(user)
+	data, err := json.Marshal(user)
 	if err != nil {
 		fmt.Println("序列化失败")
 		return err
 	}
 	// 开始入库
+
 	_, err = this.Client.HSet(ctx, "users", strconv.Itoa(user.UserId), string(data)).Result()
+
 	if err != nil {
 		fmt.Println("保存注册用户失败 err = ", err)
 		return err
 	}
+
 	return nil
 }

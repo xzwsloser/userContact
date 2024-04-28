@@ -16,6 +16,7 @@ type UserProcess struct {
 
 // 处理注册请求
 func (this *UserProcess) ServiceProcessRegister(mes *common.Message) (err error) {
+	fmt.Println("执行了 ServiceProcessRegister 方法")
 	// 取出一个Data , 进行相应的判断,发送相应的信息
 	var registerMes common.RegisterMes
 	fmt.Println(mes)
@@ -31,7 +32,9 @@ func (this *UserProcess) ServiceProcessRegister(mes *common.Message) (err error)
 	var registerResMeg common.RegisterResMes
 	// 数据库中完成注册
 	err = model.MyUserDao.Register(&registerMes.User)
+
 	if err != nil {
+		fmt.Println("err 不为空", err)
 		if err == model.ERROR_USER_EXISTS {
 			registerResMeg.Code = 505 // 表示用户信息不存在
 			registerResMeg.Error = err.Error()
@@ -40,6 +43,7 @@ func (this *UserProcess) ServiceProcessRegister(mes *common.Message) (err error)
 			registerResMeg.Error = "注册时发生位置错误"
 		}
 	} else {
+
 		registerResMeg.Code = 200
 	}
 	// 进行反序列化操作

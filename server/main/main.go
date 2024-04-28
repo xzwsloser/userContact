@@ -36,7 +36,6 @@ func init() {
 }
 func main() {
 	// 初始化连接池
-
 	// 同时还需要初始化一个 UserDao 的实例对象 全局变量 + init 函数
 	// 服务器端监听
 	fmt.Println("服务器在8889端口进行监听")
