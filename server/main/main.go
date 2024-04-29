@@ -12,7 +12,7 @@ func Process(conn net.Conn) {
 	// 演示关闭 conn
 	defer conn.Close()
 	// 调用主控
-	processor := Processor{
+	processor := &Processor{
 		Conn: conn,
 	}
 	err := processor.process2()

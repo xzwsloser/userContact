@@ -57,12 +57,13 @@ func (this *UserProcess) NotifyMeOnline(userId int) {
 	}
 	// 开始发送 mesData
 	// 创建发送实例对象
-	tf := utils.Transfer{
+	tf := &utils.Transfer{
 		Conn: this.Conn,
 	}
+	fmt.Println("显示用户", string(mesData))
 	err = tf.WritePkg(mesData)
 	if err != nil {
-		fmt.Println("服务器端发送文件失败 ")
+		fmt.Println("服务器端发送信息失败 ")
 		return
 	}
 }
@@ -176,13 +177,13 @@ func (this *UserProcess) ServiceProcessLogin(mes *common.Message) (err error) {
 		UserMgrObj.AddOnlineUser(this)
 		// 通知其他用户上线信息
 		// 但是客户端如何发送信息呢
-		this.NotifyMeOnline(loginMes.UserId)
 		// 把在线用户放在一个key中
 		// 遍历里面的一个 map 容器
 		for k, _ := range UserMgrObj.onlineUses {
 			loginResMeg.UserIds = append(loginResMeg.UserIds, k)
 		}
-		fmt.Println(loginMes, "登陆成功")
+		this.NotifyOthersOnline(loginMes.UserId)
+		fmt.Println(loginMes, "登录成功")
 	}
 	// 完成序列化
 	// 1. 首先序列化 loginResMsg

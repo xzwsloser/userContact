@@ -7,6 +7,7 @@ import (
 	"net"
 	"os"
 	"userContact/common"
+	"userContact/server/model"
 	"userContact/server/utils"
 )
 
@@ -84,6 +85,7 @@ func (up *UserProcess) Login(userId int, userPwd string) (err error) {
 
 	// 首先连接服务器端, 一般用于读取配置文件
 	conn, err := net.Dial("tcp", "localhost:8889")
+
 	if err != nil {
 		fmt.Println("net.Dial error =", err)
 		return
@@ -128,7 +130,7 @@ func (up *UserProcess) Login(userId int, userPwd string) (err error) {
 		return
 	}
 	// 演示关闭
-	defer conn.Close()
+
 	fmt.Println("客户端发送消息长度成功")
 	// 发送消息本身
 	_, err = conn.Write(data)
@@ -158,19 +160,30 @@ func (up *UserProcess) Login(userId int, userPwd string) (err error) {
 		// 显示登录成功之后的一个菜单,但是需要利用循环显示
 		// 登录成功, 之后可以显示在线用户的列表
 		// 遍历一个 Userid
-		fmt.Println("当前在线用户列表为")
 		for _, v := range loginResMes.UserIds {
 			if v == userId {
 				continue
 			}
-			fmt.Printf("用户Id 为 %d \n", v)
+
+			// 完成一个全局变量的初始化
+			user := &model.User{
+				UserId:     v,
+				UserStatus: common.UserOnline,
+			}
+			// 不需要其他信息
+			// 其实就是初始信息
+			onlineUsers[v] = user
 		}
+		fmt.Println("\n\n")
+		go ServerProcess(conn)
 		for {
+
 			ShowMenu() // 显示菜单
-			// 这里还要开启一个协程
-			// 这一个协程时刻监听服务器的响应,如果服务器有数据推送到客户端,并且显示在客户端
 			// 这一个协程的作用就是不断读取信息
-			go ServerProcess(conn)
+			// 这一个协程时刻监听服务器的响应,如果服务器有数据推送到客户端,并且显示在客户端
+			// 这里还要开启一个协程
+			// 完成一个初始化
+
 		}
 	} else if loginResMes.Code == 500 {
 		fmt.Println(loginResMes.Error)

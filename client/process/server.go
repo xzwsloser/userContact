@@ -1,9 +1,11 @@
 package userprocess
 
 import (
+	"encoding/json"
 	"fmt"
 	"net"
 	"os"
+	"userContact/common"
 	"userContact/server/utils"
 )
 
@@ -23,6 +25,7 @@ func ShowMenu() {
 	switch key {
 	case 1:
 		// 显示在用户列表
+		outputOnlineUser()
 	case 2:
 		// 发送消息
 	case 3:
@@ -46,10 +49,28 @@ func ServerProcess(conn net.Conn) {
 		// 注意里面的Read 函数们没有读取到数据不会报错,而是等待一个特定的时间之后就会报错
 		mes, err := tf.ReadPkg()
 		if err != nil {
-			fmt.Println("协程读取服务器端信息失败")
+			fmt.Println("tf.ReadPkg err=", err)
 			return
 		}
 		// 读取到消息,进行下一步逻辑处理
-		fmt.Println(mes)
+		// 开始处理消息
+		switch mes.Type {
+		case common.NotifyUserStatusMesType: // 上线消息
+			// 取出 mes.Data
+			// 把 当前用户的状态保存到用户的 map 中 map[int]User
+			// 开始处理信息
+			// 把状态保存到用户列表
+			// 编写方法处理返回的信息
+			var notifyUserStatusMes common.NotifyUserStatusMes
+			err := json.Unmarshal([]byte(mes.Data), &notifyUserStatusMes)
+			if err != nil {
+				fmt.Println("返回信息序列化失败")
+			}
+			updateUserStatus(&notifyUserStatusMes)
+
+		default:
+			// 无法处理的消息
+			fmt.Println("服务器发送协程无法处理的消息")
+		}
 	}
 }

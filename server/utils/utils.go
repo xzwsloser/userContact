@@ -56,6 +56,7 @@ func (this *Transfer) WritePkg(mesData []byte) (err error) {
 
 	binary.BigEndian.PutUint32(this.Buf[:4], pkgLen)
 	n, err := this.Conn.Write(this.Buf[:4])
+	fmt.Println(err)
 	if n != 4 || err != nil {
 		fmt.Println("发送长度失败")
 		return

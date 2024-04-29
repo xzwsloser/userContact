@@ -47,7 +47,7 @@ func (this *Processor) ServiceProcessMes(mes *common.Message) (err error) {
 func (this *Processor) process2() (err error) {
 	// 循环读取客户发送的消息
 	// 创建 Transfer 对象
-	var tf utils.Transfer = utils.Transfer{
+	var tf *utils.Transfer = &utils.Transfer{
 		Conn: this.Conn,
 	}
 	mes, err := tf.ReadPkg()
