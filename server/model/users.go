@@ -6,7 +6,8 @@ package model
 type User struct {
 	// 绑定对象时,根据标签值判断哪一个字段的值赋值给哪一个字段
 	// 和数据库中的字段名称一致
-	UserId   int    `json:"userid"`
-	UserPwd  string `json:"userpwd"` // 序列化或者反序列化成功
-	UserName string `json:"username"`
+	UserId     int    `json:"userid"`
+	UserPwd    string `json:"userpwd"` // 序列化或者反序列化成功
+	UserName   string `json:"username"`
+	UserStatus int    `json:"userstatus"`
 }

@@ -156,6 +156,15 @@ func (up *UserProcess) Login(userId int, userPwd string) (err error) {
 	if loginResMes.Code == 200 {
 		//fmt.Println("登陆成功")
 		// 显示登录成功之后的一个菜单,但是需要利用循环显示
+		// 登录成功, 之后可以显示在线用户的列表
+		// 遍历一个 Userid
+		fmt.Println("当前在线用户列表为")
+		for _, v := range loginResMes.UserIds {
+			if v == userId {
+				continue
+			}
+			fmt.Printf("用户Id 为 %d \n", v)
+		}
 		for {
 			ShowMenu() // 显示菜单
 			// 这里还要开启一个协程

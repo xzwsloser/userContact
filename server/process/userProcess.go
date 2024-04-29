@@ -11,7 +11,60 @@ import (
 
 // 处理用户需要的字段
 type UserProcess struct {
-	Conn net.Conn
+	Conn   net.Conn
+	UserId int // 表示当前连接所属用户的 Id 号码
+}
+
+// 通知所有用户在线信息的方法
+func (this *UserProcess) NotifyOthersOnline(userId int) {
+	// 需要遍历一个上线的列表
+	// 每一次客户端和服务端之间的协程把用户 Id 发送到服务器端
+	// 服务器端发送这一个信息即可
+	// 发送给之前定义的在线用户列表即可
+	for id, up := range UserMgrObj.onlineUses {
+		if id == userId {
+			continue
+		}
+		// 开始拿到 up 中的连接,发送连接
+		up.NotifyMeOnline(userId) // up 也是一个 UserProcess 对象
+	}
+
+}
+
+func (this *UserProcess) NotifyMeOnline(userId int) {
+	// 拿到连接发送状态
+	// 开始组装消息
+	// NotifyStatusMes
+	var mes common.Message
+	// 开始封装
+	mes.Type = common.NotifyUserStatusMesType
+	var notifyUserStatusMes common.NotifyUserStatusMes
+	notifyUserStatusMes.UserId = userId
+	notifyUserStatusMes.Status = common.UserOnline
+	// 开始序列化
+	data, err := json.Marshal(notifyUserStatusMes)
+	if err != nil {
+		fmt.Println("序列化出错")
+		return
+	}
+	// 开始赋值
+	mes.Data = string(data)
+	// 开始把 mes 序列化
+	mesData, err := json.Marshal(mes)
+	if err != nil {
+		fmt.Println("序列化失败")
+		return
+	}
+	// 开始发送 mesData
+	// 创建发送实例对象
+	tf := utils.Transfer{
+		Conn: this.Conn,
+	}
+	err = tf.WritePkg(mesData)
+	if err != nil {
+		fmt.Println("服务器端发送文件失败 ")
+		return
+	}
 }
 
 // 处理注册请求
@@ -116,6 +169,19 @@ func (this *UserProcess) ServiceProcessLogin(mes *common.Message) (err error) {
 	} else {
 		// 开始封装正确信息
 		loginResMeg.Code = 200
+		// 登录成功,可以放入字段了
+		// 登陆成功的 UserId 复制该用户信息
+		this.UserId = loginMes.UserId
+		// 相当于连接到信息
+		UserMgrObj.AddOnlineUser(this)
+		// 通知其他用户上线信息
+		// 但是客户端如何发送信息呢
+		this.NotifyMeOnline(loginMes.UserId)
+		// 把在线用户放在一个key中
+		// 遍历里面的一个 map 容器
+		for k, _ := range UserMgrObj.onlineUses {
+			loginResMeg.UserIds = append(loginResMeg.UserIds, k)
+		}
 		fmt.Println(loginMes, "登陆成功")
 	}
 	// 完成序列化
