@@ -11,6 +11,7 @@ const (
 	RegisterMesType         = "RegisterMes"
 	RegisterResMesType      = "RegisterResMes"
 	NotifyUserStatusMesType = "NotifyUserStatusMes"
+	SmsMesType              = "SmsMes"
 )
 const (
 	UserOnline = iota
@@ -55,4 +56,10 @@ type RegisterResMes struct {
 type NotifyUserStatusMes struct {
 	UserId int `json:"userid"`
 	Status int `json:"userstatus"`
+}
+
+// 新增一个消息结构体
+type SmsMes struct {
+	Context    string `json:"context"`
+	model.User        // 匿名结构体,相当于一个内嵌结构体
 }

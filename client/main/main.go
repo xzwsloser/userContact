@@ -2,10 +2,18 @@ package main
 
 import (
 	"fmt"
+	"net"
 	userprocess "userContact/client/process"
 )
 
 func main() {
+	// 首先书初始化 conn
+	conn, err := net.Dial("tcp", "localhost:8889")
+	defer conn.Close()
+	if err != nil {
+		fmt.Println("获取连接失败")
+		return
+	}
 	// 接受用户的选择和菜单的显示
 	var key int
 	// 判断是否循环显示菜单
@@ -30,7 +38,9 @@ func main() {
 			fmt.Println("请输入用户的密码")
 			fmt.Scanf("%s\n", &userPwd)
 			var up *userprocess.UserProcess
-			up = &userprocess.UserProcess{}
+			up = &userprocess.UserProcess{
+				Conn: conn,
+			}
 			err := up.Login(userId, userPwd)
 			if err != nil {
 				fmt.Println("登录的业务逻辑有误")
@@ -48,7 +58,9 @@ func main() {
 			fmt.Println("请输入用户的昵称")
 			fmt.Scanf("%s\n", &userName)
 			// 调用一个 UserProcess 示例中的方法
-			up := &userprocess.UserProcess{}
+			up := &userprocess.UserProcess{
+				Conn: conn,
+			}
 			err := up.Register(userId, userPwd, userName)
 			if err != nil {
 				fmt.Println("注册失败请重试")

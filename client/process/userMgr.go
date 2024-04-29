@@ -2,6 +2,7 @@ package userprocess
 
 import (
 	"fmt"
+	clientmodel "userContact/client/model"
 	"userContact/common"
 	"userContact/server/model"
 )
@@ -9,6 +10,9 @@ import (
 // 定义一个全局变量
 // 定义一个客户端需要维护的一个 map[int]User
 var onlineUsers map[int]*model.User = make(map[int]*model.User, 10)
+var CurUser clientmodel.CurUser
+
+// 用户登录成功之后,完成对于 CurUser 的初始化
 
 // 但是初始化工作在哪里
 // 初始化工作应该在登陆成功的时候

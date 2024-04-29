@@ -15,6 +15,8 @@ type Processor struct {
 // 根据客户端发送的请求的种类不同,调用不同函数, 相当于 Controller 层
 // 这一个相当于一个主控
 func (this *Processor) ServiceProcessMes(mes *common.Message) (err error) {
+	// 查看是否可以在客户端接收到消息
+	fmt.Println("mes=", mes)
 	switch mes.Type {
 	case common.LoginMesType:
 		// 登录业务逻辑
@@ -36,7 +38,11 @@ func (this *Processor) ServiceProcessMes(mes *common.Message) (err error) {
 		}
 		// 创建一个方法处理注册请求
 		// 类似上面的一个方法
-
+	case common.SmsMesType:
+		// 发送消息
+		// 创建实例转发消息
+		smsProcess := &process.SmsProcess{}
+		smsProcess.SendGroupMes(mes)
 	default:
 
 		fmt.Println("消息类型不存在")

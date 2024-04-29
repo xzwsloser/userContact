@@ -12,12 +12,13 @@ import (
 )
 
 type UserProcess struct {
+	Conn net.Conn
 	// 暂时不用字段
 }
 
 func (up *UserProcess) Register(userid int, userpwd string, username string) (err error) {
 	// 1. 连接到服务器
-	conn, err := net.Dial("tcp", "localhost:8889")
+
 	if err != nil {
 		fmt.Println("net.Dial error = ", err)
 		return err
@@ -45,7 +46,7 @@ func (up *UserProcess) Register(userid int, userpwd string, username string) (er
 	// 开始发送长度,其实就是 WritePkg 方法
 	// 开始创建一个
 	tf := &utils.Transfer{
-		Conn: conn,
+		Conn: up.Conn,
 	}
 	err = tf.WritePkg(data)
 	if err != nil {
@@ -84,12 +85,7 @@ func (up *UserProcess) Login(userId int, userPwd string) (err error) {
 	// 开始定一个协议
 
 	// 首先连接服务器端, 一般用于读取配置文件
-	conn, err := net.Dial("tcp", "localhost:8889")
 
-	if err != nil {
-		fmt.Println("net.Dial error =", err)
-		return
-	}
 	// 序列化信息发送消息给服务端
 	var mes common.Message
 	mes.Type = common.LoginMesType
@@ -124,7 +120,7 @@ func (up *UserProcess) Login(userId int, userPwd string) (err error) {
 	// 这里需要利用 数组创建切片
 	binary.BigEndian.PutUint32(bytes[0:4], pkgLen)
 	// 发送一个长度
-	n, err := conn.Write(bytes[0:4])
+	n, err := up.Conn.Write(bytes[0:4])
 	if n != 4 || err != nil {
 		fmt.Println("net.Dial , err =", err)
 		return
@@ -133,13 +129,13 @@ func (up *UserProcess) Login(userId int, userPwd string) (err error) {
 
 	fmt.Println("客户端发送消息长度成功")
 	// 发送消息本身
-	_, err = conn.Write(data)
+	_, err = up.Conn.Write(data)
 	if err != nil {
 		fmt.Println("发送消息失败, err =", err)
 	}
 	// 其实这里可以创建一个 全局变量 Tf 进行操作
 	var tf utils.Transfer = utils.Transfer{
-		Conn: conn,
+		Conn: up.Conn,
 	}
 	mes, err = tf.ReadPkg()
 	fmt.Println(mes, err)
@@ -156,6 +152,9 @@ func (up *UserProcess) Login(userId int, userPwd string) (err error) {
 	}
 	// 问什么会打印失败呢
 	if loginResMes.Code == 200 {
+		CurUser.Conn = up.Conn
+		CurUser.User.UserId = userId
+		CurUser.User.UserStatus = common.UserOnline
 		//fmt.Println("登陆成功")
 		// 显示登录成功之后的一个菜单,但是需要利用循环显示
 		// 登录成功, 之后可以显示在线用户的列表
@@ -175,7 +174,7 @@ func (up *UserProcess) Login(userId int, userPwd string) (err error) {
 			onlineUsers[v] = user
 		}
 		fmt.Println("\n\n")
-		go ServerProcess(conn)
+		go ServerProcess(up.Conn)
 		for {
 
 			ShowMenu() // 显示菜单

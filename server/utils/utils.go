@@ -21,7 +21,7 @@ func (this *Transfer) ReadPkg() (mes common.Message, err error) {
 	for {
 		n, err := this.Conn.Read(this.Buf[:4]) // 注意读取的长度
 		if err != nil {
-			fmt.Println(err)
+
 			err = errors.New("read pkg header error")
 			return mes, err
 		}
