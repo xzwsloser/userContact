@@ -10,7 +10,7 @@ import (
 func Process(conn net.Conn) {
 	// 用于读取客户端发送的信息
 	// 演示关闭 conn
-	defer conn.Close()
+
 	// 调用主控
 	processor := &Processor{
 		Conn: conn,

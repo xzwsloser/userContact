@@ -33,7 +33,10 @@ func ShowMenu() {
 		// 发送消息
 		fmt.Println("请输入你想对大家说点什么")
 		fmt.Scanf("%s\n", &context)
-		smsProcess.SendGroupMes(context)
+		err := smsProcess.SendGroupMes(context)
+		if err != nil {
+			fmt.Println("发送信息失败, err =", err)
+		}
 	case 3:
 		// 查看信息列表
 	case 4:
@@ -75,7 +78,7 @@ func ServerProcess(conn net.Conn) {
 			updateUserStatus(&notifyUserStatusMes)
 		case common.SmsMesType:
 			// 有人发消息开始返回
-
+			outputGroupMes(&mes)
 		default:
 			// 无法处理的消息
 			fmt.Println("服务器发送协程无法处理的消息")
